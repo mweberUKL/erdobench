@@ -1,0 +1,15 @@
+{application, erdobench,
+ [{description, "A library for building Erlang applications doing benchmarking on Docker clusters"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {applications,
+   [kernel,
+    stdlib
+   ]},
+  {env,[]},
+  {modules, []},
+
+  {maintainers, []},
+  {licenses, []},
+  {links, []}
+ ]}.
