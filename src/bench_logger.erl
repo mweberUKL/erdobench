@@ -2,35 +2,36 @@
 
 -callback timing() -> [integer()].
 -callback commands(Node :: atom()) -> [{Module :: atom(), Function :: atom(), Params :: [term()]}].
--callback log_transform([{atom(), [term()]}]) -> [{atom(), [term()]}].
+-callback log_transform(atom(), [term()]) -> [term()].
+
+-export ([start/2]).
 
 start(Mod, Nodes) ->
-  Fh = file:open(atom_to_list(Mod)+".log"),
+  {ok, Fh} = file:open(atom_to_list(Mod)++".log", [write]),
   [First|Timings] = Mod:timing(),
   timer:apply_after(First, ?MODULE, read, [Mod, Fh, Nodes, Timings]).
 
 read(Mod, Fh, Nodes, Timings) ->
   Commands = lists:map(fun(Node) -> Mod:commands(Node) end, Nodes),
-  Results = lists:map(fun({Node, Commands}) ->
+  Results = lists:map(fun({Node, Cmds}) ->
                         Reses = lists:map(fun({Module, Function, Params}) ->
                                             rpc:call(Node, Module, Function, Params)
-                                          end, Commands),
-                        {Node, Reses}
+                                          end, Cmds),
+                        {Node, Mod:log_transform(Node, Reses)}
                       end,
                       lists:zip(Nodes, Commands)),
-  TransResults = Mod:log_transform(Results),
-  log(Fh, TransResults),
+  log(Fh, Results),
   case Timings of
     [] ->
       file:close(Fh),
       done;
     [H|T] ->
-      timer:apply_after(H, ?MODULE, read, [Mod, Nodes, T]),
+      timer:apply_after(H, ?MODULE, read, [Mod, Fh, Nodes, T]),
       continuing
   end.
 
 log(Fh, Results) ->
   lists:foreach(fun({Node, Reses}) ->
-                  Format = atom_to_list(Node) + lists:flatten(lists:join(";", lists:duplicate(length(Reses), "~p"))),
+                  Format = atom_to_list(Node) ++ lists:flatten(lists:join(";", lists:duplicate(length(Reses), "~p"))),
                   io:fwrite(Fh, Format, Reses)
                 end, Results).
