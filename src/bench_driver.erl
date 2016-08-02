@@ -18,8 +18,8 @@ work(Mod, {BPid, BRef}, UserData, Nodes, Timings) ->
                             Nodes),
   case Timings of
     [] ->
-      BPid ! {BRef, done},
       io:format("Worker ~p done~n", [Mod]),
+      BPid ! {BRef, done},
       done;
     [H|T] ->
       timer:apply_after(H, ?MODULE, work, [Mod, {BPid, BRef}, NewUserData, Nodes, T])
