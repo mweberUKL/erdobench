@@ -32,6 +32,6 @@ read(Mod, Fh, Nodes, Timings) ->
 
 log(Fh, Results) ->
   lists:foreach(fun({Node, Reses}) ->
-                  Format = atom_to_list(Node) ++ string:join(lists:duplicate(length(Reses), "~p"), ";"),
+                  Format = atom_to_list(Node) ++ ";" ++ string:join(lists:duplicate(length(Reses), "~w"), ";") ++ "~n",
                   io:fwrite(Fh, Format, Reses)
                 end, Results).
