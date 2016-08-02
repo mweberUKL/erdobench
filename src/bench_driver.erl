@@ -3,7 +3,7 @@
 -callback timing() -> [integer()].
 -callback work(Node :: atom(), UserData :: term()) -> term().
 
--export ([start/3]).
+-export ([start/3, work/4]).
 
 start(Mod, UserData, Nodes) ->
   [First|Timings] = Mod:timing(),

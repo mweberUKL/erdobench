@@ -4,7 +4,7 @@
 -callback commands(Node :: atom()) -> [{Module :: atom(), Function :: atom(), Params :: [term()]}].
 -callback log_transform(atom(), [term()]) -> [term()].
 
--export ([start/2]).
+-export ([start/2, read/4]).
 
 start(Mod, Nodes) ->
   {ok, Fh} = file:open(atom_to_list(Mod)++".log", [write]),
