@@ -19,5 +19,5 @@ work(Mod, UserData, Nodes, Timings) ->
     [] ->
       done;
     [H|T] ->
-      timer:apply_after(H, ?MODULE, word, [Mod, NewUserData, Nodes, T])
+      timer:apply_after(H, ?MODULE, work, [Mod, NewUserData, Nodes, T])
   end.
