@@ -1,6 +1,6 @@
 -module(bench_logger).
 
--callback timing() -> [integer()].
+-callback timing() -> timing:timing().
 -callback commands(Node :: atom()) -> [{Module :: atom(), Function :: atom(), Params :: [term()]}].
 -callback log_transform(atom(), [term()]) -> [term()].
 
@@ -8,10 +8,11 @@
 
 start(Mod, BenchRef, Nodes) ->
   {ok, Fh} = file:open(atom_to_list(Mod)++".log", [write]),
-  [First|Timings] = Mod:timing(),
-  timer:apply_after(First, ?MODULE, read, [Mod, BenchRef, Fh, Nodes, Timings]).
+  TF = Mod:timing(),
+  {First, TFNew} = TF(),
+  timer:apply_after(First, ?MODULE, read, [Mod, BenchRef, Fh, Nodes, TFNew]).
 
-read(Mod, {BPid, BRef}, Fh, Nodes, Timings) ->
+read(Mod, {BPid, BRef}, Fh, Nodes, TF) ->
   Commands = lists:map(fun(Node) -> Mod:commands(Node) end, Nodes),
   Results = lists:map(fun({Node, Cmds}) ->
                         Reses = lists:map(fun({Module, Function, Params}) ->
@@ -21,14 +22,14 @@ read(Mod, {BPid, BRef}, Fh, Nodes, Timings) ->
                       end,
                       lists:zip(Nodes, Commands)),
   log(Fh, Results),
-  case Timings of
-    [] ->
+  case TF() of
+    done ->
       file:close(Fh),
       io:format("Logger ~p done~n", [Mod]),
       BPid ! {BRef, done},
       done;
-    [H|T] ->
-      timer:apply_after(H, ?MODULE, read, [Mod, {BPid, BRef}, Fh, Nodes, T]),
+    {T, TFNew} ->
+      timer:apply_after(T, ?MODULE, read, [Mod, {BPid, BRef}, Fh, Nodes, TFNew]),
       continuing
   end.
 
