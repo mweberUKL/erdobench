@@ -10,6 +10,7 @@ start(Mod, UserData, Nodes) ->
   timer:apply_after(First, ?MODULE, work, [Mod, UserData, Nodes, Timings]).
 
 work(Mod, UserData, Nodes, Timings) ->
+  io:format("doing work for ~p~n", [Mod]),
   NewUserData = lists:foldl(fun(Node, UD) ->
                               Mod:work(Node, UD)
                             end,
