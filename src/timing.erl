@@ -4,7 +4,7 @@
 -include_lib("eunit/include/eunit.hrl").
 -endif.
 
--type timing() :: fun(() -> integer() | done).
+-type timing() :: fun(() -> {integer(), timing()} | done).
 -export_type([timing/0]).
 
 -export ([once/1, repeat/2, profile/1, repeat_timing/2]).
