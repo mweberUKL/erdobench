@@ -18,6 +18,7 @@ work(Mod, UserData, Nodes, Timings) ->
                             Nodes),
   case Timings of
     [] ->
+      io:format("Worker ~p done~n", [Mod]),
       done;
     [H|T] ->
       timer:apply_after(H, ?MODULE, work, [Mod, NewUserData, Nodes, T])

@@ -24,6 +24,7 @@ read(Mod, Fh, Nodes, Timings) ->
   case Timings of
     [] ->
       file:close(Fh),
+      io:format("Logger ~p done~n", [Mod]),
       done;
     [H|T] ->
       timer:apply_after(H, ?MODULE, read, [Mod, Fh, Nodes, T]),
