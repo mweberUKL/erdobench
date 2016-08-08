@@ -15,9 +15,7 @@ start(Mod, BenchRef, Nodes) ->
 read(Mod, {BPid, BRef}, Fh, Nodes, TF) ->
   Commands = lists:map(fun(Node) -> Mod:commands(Node) end, Nodes),
   Results = lists:map(fun({Node, Cmds}) ->
-                        io:format("Iterating over funs"),
                         Reses = lists:map(fun(F) ->
-                                            io:format("Calling fun ~p~n", [F]),
                                             F()
                                           end, Cmds),
                         {Node, Mod:log_transform(Node, Reses)}
