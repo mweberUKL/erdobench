@@ -1,7 +1,7 @@
 -module(bench_logger).
 
 -callback timing() -> timing:timing().
--callback commands(Node :: atom()) -> [{Module :: atom(), Function :: atom(), Params :: [term()]}].
+-callback commands(Node :: atom()) -> [fun(() -> term())].
 -callback log_transform(atom(), [term()]) -> [term()].
 
 -export ([start/3, read/5]).
@@ -15,7 +15,9 @@ start(Mod, BenchRef, Nodes) ->
 read(Mod, {BPid, BRef}, Fh, Nodes, TF) ->
   Commands = lists:map(fun(Node) -> Mod:commands(Node) end, Nodes),
   Results = lists:map(fun({Node, Cmds}) ->
+                        io:format("Iterating over funs"),
                         Reses = lists:map(fun(F) ->
+                                            io:format("Calling fun ~p~n", [F]),
                                             F()
                                           end, Cmds),
                         {Node, Mod:log_transform(Node, Reses)}
