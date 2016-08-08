@@ -15,8 +15,8 @@ start(Mod, BenchRef, Nodes) ->
 read(Mod, {BPid, BRef}, Fh, Nodes, TF) ->
   Commands = lists:map(fun(Node) -> Mod:commands(Node) end, Nodes),
   Results = lists:map(fun({Node, Cmds}) ->
-                        Reses = lists:map(fun({Module, Function, Params}) ->
-                                            rpc:call(Node, Module, Function, Params)
+                        Reses = lists:map(fun(F) ->
+                                            F()
                                           end, Cmds),
                         {Node, Mod:log_transform(Node, Reses)}
                       end,
