@@ -1,13 +1,13 @@
 -module(erdobench).
 
 %% API exports
--export([start/3]).
+-export([start/4]).
 
 %%====================================================================
 %% API functions
 %%====================================================================
 
-start(Loggers, Drivers, Nodes, {PID, Ref}) ->
+start(Loggers, Drivers, Nodes, {PID, PRef}) ->
   LoggerRefs = lists:map(fun(LMod) ->
                           Ref = make_ref(),
                           bench_logger:start(LMod, {self(), Ref}, Nodes),
@@ -34,7 +34,7 @@ start(Loggers, Drivers, Nodes, {PID, Ref}) ->
                   end
                 end,
                 DriverRefs),
-  PID ! {Ref, done}.
+  PID ! {PRef, done}.
 
 %%====================================================================
 %% Internal functions
