@@ -7,7 +7,7 @@
 %% API functions
 %%====================================================================
 
-start(Loggers, Drivers, Nodes) ->
+start(Loggers, Drivers, Nodes, {PID, Ref}) ->
   LoggerRefs = lists:map(fun(LMod) ->
                           Ref = make_ref(),
                           bench_logger:start(LMod, {self(), Ref}, Nodes),
@@ -34,7 +34,7 @@ start(Loggers, Drivers, Nodes) ->
                   end
                 end,
                 DriverRefs),
-  halt().
+  PID ! {Ref, done}.
 
 %%====================================================================
 %% Internal functions
